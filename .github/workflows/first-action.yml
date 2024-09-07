@@ -1,0 +1,10 @@
+name: First Worflow
+on: workflow_dispatch
+jobs:
+  first_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Print program
+      run: echo "Deploying Python program"
+    - name: exit program
+      run: echo "Goodbye!"
