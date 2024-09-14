@@ -33,6 +33,8 @@ jobs:
         #----------------------------------------------
         # install dependencies if cache does not exist
         #----------------------------------------------
+        - name: init poetry env.
+          run: poetry init
         - name: Install dependencies
           # if:steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
           run: poetry install --no-interaction --no-root
