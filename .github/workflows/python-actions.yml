@@ -40,19 +40,19 @@ jobs:
           id: cached-poetry-dependencies
           uses: actions/cache@v4
           with:
-            path: ~/my-custom-path
+            path: .venv
             key: venv-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}            
         #----------------------------------------------
         # install dependencies if cache does not exist
         #----------------------------------------------
-        - name: init poetry env.
+        - name: init poetry env
           run: poetry init
         - name: Install dependencies
           if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
           run: poetry install --no-interaction --no-root
         - name: run deploy_macro using poetry
           run: |
-            source ~/my-custom-path/bin/activate
+            source .venv/bin/activate
             poetry completions bash >> ~/.bash_completion
             poetry run python3 deploy_macro.py
           # poetry build
