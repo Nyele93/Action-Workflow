@@ -1,0 +1,45 @@
+name: Actions for Python Project
+on: 
+  push:
+    branches:
+      - 'main'
+      - 'dev'
+jobs: 
+  init_env:
+    runs-on: ubuntu-latest
+    steps:
+        #----------------------------------------------
+        #       check-out repo and set-up python
+        #----------------------------------------------
+        - name: Get code
+          uses: actions/checkout@v3
+            #with:
+        - name: setup python
+          id: install-python
+          uses: actions/setup-python@v4
+          with: 
+            python-version: "3.10"
+        #----------------------------------------------
+        #  -----  install & configure poetry  -----
+        #----------------------------------------------
+        - name: install poetry
+          uses: snok/install-poetry@v1
+          with:
+            version: "1.5.1"
+            virtualenvs-create: true
+            virtualenvs-in-project: false
+            virtualenvs-path: ~/my-custom-path
+            installer-parallel: true
+        #----------------------------------------------
+        # install dependencies if cache does not exist
+        #----------------------------------------------
+        - name: Install dependencies
+          # if:steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+          run: poetry install --no-interaction --no-root
+        - name: run deploy_macro using poetry
+          run: |
+            source .venv/bin/activate
+            poetry completions bash >> ~/.bash_completion
+            poetry run python3 deploy_macro.py
+          # poetry build
+          #working-directory: "./app"
