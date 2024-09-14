@@ -5,8 +5,11 @@ on:
       - 'main'
       - 'dev'
 jobs: 
-  init_env:
+  deploy_python_macro:
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          python-version: ['3.10', '3.9', '3.8']  # Choose compatible versions
     steps:
         #----------------------------------------------
         #       check-out repo and set-up python
@@ -18,7 +21,7 @@ jobs:
           id: install-python
           uses: actions/setup-python@v4
           with: 
-            python-version: "3.10"
+            python-version: ${{ matrix.python-version }}
         #----------------------------------------------
         #  -----  install & configure poetry  -----
         #----------------------------------------------
@@ -31,16 +34,25 @@ jobs:
             virtualenvs-path: ~/my-custom-path
             installer-parallel: true
         #----------------------------------------------
+        #       load cached venv if cache exists
+        #----------------------------------------------
+        - name: Load cached venv
+          id: cached-poetry-dependencies
+          uses: actions/cache@v4
+          with:
+            path: ~/my-custom-path
+            key: venv-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}            
+        #----------------------------------------------
         # install dependencies if cache does not exist
         #----------------------------------------------
         - name: init poetry env.
           run: poetry init
         - name: Install dependencies
-          # if:steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+          if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
           run: poetry install --no-interaction --no-root
         - name: run deploy_macro using poetry
           run: |
-            source .venv/bin/activate
+            source ~/my-custom-path/bin/activate
             poetry completions bash >> ~/.bash_completion
             poetry run python3 deploy_macro.py
           # poetry build
