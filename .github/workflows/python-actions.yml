@@ -8,6 +8,10 @@ on:
     paths-ignore:
       - 'state_files/*'
   workflow_dispatch:
+
+env:
+  POETRY_VERSION: "1.4.2"
+  
 jobs: 
   deploy_python_macro:
     runs-on: ubuntu-latest
@@ -28,6 +32,19 @@ jobs:
           uses: actions/setup-python@v4
           with: 
             python-version: ${{ matrix.python-version }}
+        #----------------------------------------------
+        #------  cache Poetry and dependencies  -------
+        #----------------------------------------------
+        - name: Cache poetry installation
+          uses: actions/cache@v4
+          with:
+            path: ~/.cache/pypoetry
+            key: poetry-cache-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+        - name: Cache Packages
+          uses: actions/cache@v3
+          with:
+              path: ~/.local
+              key: poetry-local-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/*.yml') }}            
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
@@ -55,7 +72,9 @@ jobs:
           run: poetry init
         - name: Install dependencies
           if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-          run: poetry install --no-interaction --no-root
+          run: |
+            poetry lock --no-update
+            poetry install --no-interaction --no-root
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
