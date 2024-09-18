@@ -61,7 +61,8 @@ jobs:
           run: |
             source .venv/bin/activate
             poetry completions bash >> ~/.bash_completion
-            poetry run python3 deploy_macro.py > 'py_output_file={}' >> $GITHUB_OUTPUT
+            py_output=$(poetry run python3 deploy_macro.py)
+             echo "$py_output" > 'py_output_file={}' >> $GITHUB_OUTPUT
           # poetry build
           #working-directory: "./app"
   deploy_ansible:
