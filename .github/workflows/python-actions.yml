@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-          python-version: ['3.10', '3.9', '3.8']  # Choose compatible versions
+          python-version: ['3.10', '3.9']  # Choose compatible versions
     steps:
         #----------------------------------------------
         #       check-out repo and set-up python
