@@ -62,7 +62,8 @@ jobs:
             source .venv/bin/activate
             poetry completions bash >> ~/.bash_completion
             poetry run python3 deploy_macro.py
-            echo "py_output_file=$(cat py_output.json)" >> $GITHUB_OUTPUT
+            compact_output=$(cat py_output.json | jq -c '.')
+            echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
             #echo "py_output.json" > 'py_output_file={}' >> $GITHUB_OUTPUT
           # poetry build
           #working-directory: "./app"
