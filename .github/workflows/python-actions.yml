@@ -75,6 +75,7 @@ jobs:
           run: |
             poetry lock --no-update
             poetry install --no-interaction --no-root
+            echo "poetry done..."
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
