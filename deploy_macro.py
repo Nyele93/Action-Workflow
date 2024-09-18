@@ -29,7 +29,7 @@ with open('py_output.json', 'w') as f:
     json.dump(output, f, indent=4)
 
 # Optionally print the output
-print(json.dumps(output, indent=4))
+#print(json.dumps(output, indent=4))
 
 # Press the green button in the gutter to run the script.
 #if __name__ == '__main__':
