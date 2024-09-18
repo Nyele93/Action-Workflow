@@ -15,7 +15,7 @@ jobs:
         matrix:
           python-version: ['3.10', '3.9']  # Choose compatible versions
     outputs:
-      script-file: ${{ steps.write_py_file.outputs.py-output-file }}
+      script-file: ${{ steps.write_py_file.outputs.py_output_file }}
     steps:
         #----------------------------------------------
         #       check-out repo and set-up python
@@ -61,7 +61,7 @@ jobs:
           run: |
             source .venv/bin/activate
             poetry completions bash >> ~/.bash_completion
-            poetry run python3 deploy_macro.py > 'py-output-file={}' >> $GITHUB_OUTPUT
+            poetry run python3 deploy_macro.py > 'py_output_file={}' >> $GITHUB_OUTPUT
           # poetry build
           #working-directory: "./app"
   deploy_ansible:
