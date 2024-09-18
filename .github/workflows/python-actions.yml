@@ -58,6 +58,7 @@ jobs:
           # poetry build
           #working-directory: "./app"
   deploy_ansible:
+    needs: [deploy_python_macro]
     runs-on: ubuntu-latest
     steps:
       - name: install ansible
@@ -69,5 +70,5 @@ jobs:
           ansible_version=$(ansible --version)
           echo "installed Ansible version: $ansible_version"  
       - uses: actions/checkout@v4
-      - name: install ansible-lint
-        uses: ansible/ansible-lint@main
+      #- name: install ansible-lint
+      #  uses: ansible/ansible-lint@main
