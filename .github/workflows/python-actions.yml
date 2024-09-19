@@ -106,5 +106,6 @@ jobs:
         run: |
           echo "${{ needs.deploy_python_macro.outputs.script-file }}"
           echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"
+          echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
       #- name: install ansible-lint
       #  uses: ansible/ansible-lint@main
