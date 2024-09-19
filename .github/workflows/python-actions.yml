@@ -88,6 +88,8 @@ jobs:
           # poetry build
           #working-directory: "./app"
   deploy_ansible:
+    env:
+      PLAYBOOK_DIR: ./playbooks/proj_name/
     needs: [deploy_python_macro]
     runs-on: ubuntu-latest
     steps:
@@ -100,7 +102,9 @@ jobs:
           ansible_version=$(ansible --version)
           echo "installed Ansible version: $ansible_version"  
       - uses: actions/checkout@v4
-      - name: Output generated py file
-        run: echo "${{ needs.deploy_python_macro.outputs.script-file }}"
+      - name: Output generated py file and playbook directory
+        run: |
+          echo "${{ needs.deploy_python_macro.outputs.script-file }}"
+          echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"
       #- name: install ansible-lint
       #  uses: ansible/ansible-lint@main
