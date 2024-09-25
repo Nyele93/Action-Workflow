@@ -1,3 +1,0 @@
-# this is just a comment
-#deploy_playbook.yml package-latest # disable package-latest rule for playbook.yml
-#deploy_playbook.yml deprecated-module

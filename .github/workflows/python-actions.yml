@@ -125,7 +125,7 @@ jobs:
         # optional (see below):
         with:
           args: "-f full --fix=none --force-colour"
-          setup_python: "false"
+          setup_python: "true"
           working_directory: ""
           #requirements_file: ""      
       - name: Output generated py file and playbook directory
