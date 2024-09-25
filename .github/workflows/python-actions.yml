@@ -121,8 +121,8 @@ jobs:
           echo "installed Ansible version: $ansible_version"  
       - uses: actions/checkout@v4
       - name: install ansible-lint
-        uses: ansible/ansible-lint
-        # optional (see below)::
+        uses: ansible/ansible-lint@v6
+        # optional (see below):
         with:
           args: "-f full --fix=none --force-colour"
           setup_python: "false"
