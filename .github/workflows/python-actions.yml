@@ -121,13 +121,13 @@ jobs:
           echo "installed Ansible version: $ansible_version"  
       - uses: actions/checkout@v4
       - name: install ansible-lint
-        uses: ansible/ansible-lint@main
+        uses: ansible/ansible-lint@v6.21.1
         # optional (see below):
         with:
-          args: ""
+          args: "-f full --fix none --force-colour"
           setup_python: "false"
           working_directory: ""
-          requirements_file: ""      
+          #requirements_file: ""      
       - name: Output generated py file and playbook directory
         run: |
           echo "${{ needs.deploy_python_macro.outputs.script-file }}"
