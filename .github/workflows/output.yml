@@ -1,19 +1,36 @@
 name: Output information
 on: 
-  pull_request:
-    types: 
-        - opened
-        - closed
-        - reopened
-    #branches-ignore:
-    branches:
-            - 'main'
-            - 'dev-*'
-            - 'feature/**'
-  workflow_dispatch:
+  workflow_call:
+    inputs: 
+      artifact-name: 
+        description: the generated python build, Ansible and Terraform yml files.
+        required: true
+        #default:
+        type: string
+    outputs:
+      deployment-results:
+        description: The result of the deployment.
+        value: ${{ jobs.display_info.outputs.outcome }}
+      #secrets:
+        #reusable_secret:
+        #required: false
+        #type: string
+
 jobs:
     display_info:
+        outputs:
+          outcome: ${{ steps.set-deployment-result.outputs.step-result }}
+        continue-on-error: true
+        timeout-minutes: 2
         runs-on: ubuntu-latest
         steps:
+            - name: prepare files for deploying
+              run:
+                echo "generated linted files readey for deploy - ${{ inputs.artifact-name }}"
             - name: Output Github context
-              run: echo "${{ toJSON(github) }}"
+              run: |
+                echo "${{ toJSON(github) }}"
+                echo "Deploying & Uploading..."
+            - name: Set deployment output
+              id: set-deployment-result
+              run: echo "step-result=success" >> $GITHUB_OUTPUT

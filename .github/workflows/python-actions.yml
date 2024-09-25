@@ -5,8 +5,14 @@ on:
       - 'main'
       - 'dev-*'
       - 'feature/**'
+    #branches-ignore:
     paths-ignore:
       - 'state_files/*'
+  #pull_request:
+    #types: 
+      #- opened
+      #- closed
+      #- reopened
   workflow_dispatch:
 
 env:
@@ -14,10 +20,14 @@ env:
   
 jobs: 
   deploy_python_macro:
-    runs-on: ubuntu-latest
     strategy:
         matrix:
-          python-version: ['3.10', '3.9']  # Choose compatible versions
+          python-version: ['3.8','3.10', '3.9']  # Choose compatible versions
+          operating-system: [ubuntu-latest]
+          exclude:
+            - python-version: 3.8
+              operating-system: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
     outputs:
       script-file: ${{ steps.write_py_file.outputs.py_output_file }}
     steps:
@@ -50,6 +60,7 @@ jobs:
         #----------------------------------------------
         - name: install poetry
           uses: snok/install-poetry@v1
+          id: install_poetry
           with:
             version: "1.5.1"
             virtualenvs-create: true
@@ -59,23 +70,8 @@ jobs:
         #----------------------------------------------
         #       load cached venv if cache exists
         #----------------------------------------------
-        - name: Load cached venv
-          id: cached-poetry-dependencies
-          uses: actions/cache@v4
-          with:
-            path: .venv
-            key: venv-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}            
-        #----------------------------------------------
-        # install dependencies if cache does not exist
-        #----------------------------------------------
-        - name: init poetry env
-          run: poetry init
-        - name: Install dependencies
-          if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-          run: |
-            poetry lock --no-update
-            poetry install --no-interaction --no-root
-            echo "poetry done..."
+        - name: Load & cache dependencies
+          uses: ./.github/actions/cached-deps
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
@@ -84,28 +80,56 @@ jobs:
             poetry run python3 deploy_macro.py
             compact_output=$(cat py_output.json | jq -c '.')
             echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
-            #echo "py_output.json" > 'py_output_file={}' >> $GITHUB_OUTPUT
+            echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
           # poetry build
           #working-directory: "./app"
   deploy_ansible:
+    environment: ClickHouse-UAT
     env:
       PLAYBOOK_DIR: ./playbooks/proj_name/
     needs: [deploy_python_macro]
+    #container:
+      #image:
+      #env: 
+    #services:
+      #ansible_service:
+        #image:
+        #ports:
+        #  - 2489:2489
+        #env:
     runs-on: ubuntu-latest
     steps:
       - name: install ansible
         run: |
-          sudo apt update
-          sudo apt install software-properties-common
-          sudo add-apt-repository --yes --update ppa:ansible/ansible
-          sudo apt install ansible   
           ansible_version=$(ansible --version)
           echo "installed Ansible version: $ansible_version"  
       - uses: actions/checkout@v4
+      - name: install ansible-lint
+        uses: ansible/ansible-lint@main
+        # optional (see below):
+        with:
+          args: ""
+          setup_python: "false"
+          working_directory: ""
+          requirements_file: ""      
       - name: Output generated py file and playbook directory
         run: |
           echo "${{ needs.deploy_python_macro.outputs.script-file }}"
           echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"
-          echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
+          echo "loading environment secret: ${{ secrets.CH_UAT_USER_PASSWD }}"
       #- name: install ansible-lint
       #  uses: ansible/ansible-lint@main
+  display_deployment_base_info:
+    needs: [deploy_python_macro, deploy_ansible]
+    if: always()
+    uses: ./.github/workflows/output.yml   ## reusable workflow
+    with:
+      artifact-name: "${{ needs.deploy_python_macro.outputs.script-file }}"
+    #secrets:
+      #reusable-secret: 
+  display_deployment_outcome:
+    needs: display_deployment_base_info
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check output of dpeloyment
+        run: echo "${{ needs.display_deployment_base_info.outputs.deployment-results }}"
