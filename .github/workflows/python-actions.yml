@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 env:
-  POETRY_VERSION: "1.4.2"
+  POETRY_VERSION: "1.5.1"
   
 jobs: 
   deploy_python_macro:
@@ -62,7 +62,7 @@ jobs:
           uses: snok/install-poetry@v1
           id: install_poetry
           with:
-            version: "1.5.1"
+            version: ${{ env.POETRY_VERSION }}
             virtualenvs-create: true
             virtualenvs-in-project: true
             #virtualenvs-path: ~/my-custom-path

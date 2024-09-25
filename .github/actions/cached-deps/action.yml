@@ -21,6 +21,7 @@ runs:
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: |
+          poetry env use ${{ matrix.python-version }}
           poetry lock --no-update
           poetry install --no-interaction --no-root
           echo "poetry done..."
