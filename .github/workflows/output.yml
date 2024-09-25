@@ -1,0 +1,19 @@
+name: Output information
+on: 
+  pull_request:
+    types: 
+        - opened
+        - closed
+        - reopened
+    #branches-ignore:
+    branches:
+            - 'main'
+            - 'dev-*'
+            - 'feature/**'
+  workflow_dispatch:
+jobs:
+    display_info:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Output Github context
+              run: echo "${{ toJSON(github) }}"

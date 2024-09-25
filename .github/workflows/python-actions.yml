@@ -1,0 +1,111 @@
+name: Actions for Python Project
+on: 
+  push:
+    branches:
+      - 'main'
+      - 'dev-*'
+      - 'feature/**'
+    paths-ignore:
+      - 'state_files/*'
+  workflow_dispatch:
+
+env:
+  POETRY_VERSION: "1.4.2"
+  
+jobs: 
+  deploy_python_macro:
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          python-version: ['3.10', '3.9']  # Choose compatible versions
+    outputs:
+      script-file: ${{ steps.write_py_file.outputs.py_output_file }}
+    steps:
+        #----------------------------------------------
+        #       check-out repo and set-up python
+        #----------------------------------------------
+        - name: Get code
+          uses: actions/checkout@v3
+            #with:
+        - name: setup python
+          id: install-python
+          uses: actions/setup-python@v4
+          with: 
+            python-version: ${{ matrix.python-version }}
+        #----------------------------------------------
+        #------  cache Poetry and dependencies  -------
+        #----------------------------------------------
+        - name: Cache poetry installation
+          uses: actions/cache@v4
+          with:
+            path: ~/.cache/pypoetry
+            key: poetry-cache-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+        - name: Cache Packages
+          uses: actions/cache@v3
+          with:
+              path: ~/.local
+              key: poetry-local-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/*.yml') }}            
+        #----------------------------------------------
+        #  -----  install & configure poetry  ---------
+        #----------------------------------------------
+        - name: install poetry
+          uses: snok/install-poetry@v1
+          with:
+            version: "1.5.1"
+            virtualenvs-create: true
+            virtualenvs-in-project: true
+            #virtualenvs-path: ~/my-custom-path
+            installer-parallel: true
+        #----------------------------------------------
+        #       load cached venv if cache exists
+        #----------------------------------------------
+        - name: Load cached venv
+          id: cached-poetry-dependencies
+          uses: actions/cache@v4
+          with:
+            path: .venv
+            key: venv-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}            
+        #----------------------------------------------
+        # install dependencies if cache does not exist
+        #----------------------------------------------
+        - name: init poetry env
+          run: poetry init
+        - name: Install dependencies
+          if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+          run: |
+            poetry lock --no-update
+            poetry install --no-interaction --no-root
+            echo "poetry done..."
+        - name: run deploy_macro using poetry
+          id: write_py_file
+          run: |
+            source .venv/bin/activate
+            poetry completions bash >> ~/.bash_completion
+            poetry run python3 deploy_macro.py
+            compact_output=$(cat py_output.json | jq -c '.')
+            echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
+            #echo "py_output.json" > 'py_output_file={}' >> $GITHUB_OUTPUT
+          # poetry build
+          #working-directory: "./app"
+  deploy_ansible:
+    env:
+      PLAYBOOK_DIR: ./playbooks/proj_name/
+    needs: [deploy_python_macro]
+    runs-on: ubuntu-latest
+    steps:
+      - name: install ansible
+        run: |
+          sudo apt update
+          sudo apt install software-properties-common
+          sudo add-apt-repository --yes --update ppa:ansible/ansible
+          sudo apt install ansible   
+          ansible_version=$(ansible --version)
+          echo "installed Ansible version: $ansible_version"  
+      - uses: actions/checkout@v4
+      - name: Output generated py file and playbook directory
+        run: |
+          echo "${{ needs.deploy_python_macro.outputs.script-file }}"
+          echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"
+          echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
+      #- name: install ansible-lint
+      #  uses: ansible/ansible-lint@main
