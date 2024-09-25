@@ -22,7 +22,7 @@ jobs:
   deploy_python_macro:
     strategy:
         matrix:
-          python-version: ['3.8','3.10', '3.9']  # Choose compatible versions
+          python-version: ['3.9','3.10']  # Choose compatible versions
           operating-system: [ubuntu-latest]
           exclude:
             - python-version: 3.8
