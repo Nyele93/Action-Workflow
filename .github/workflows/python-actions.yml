@@ -72,6 +72,22 @@ jobs:
         #---------------------------------------------------------
         - name: Load & cache dependencies
           uses: ./.github/actions/cached-deps
+        #----------------------------------------------
+        # install dependencies if cache does not exist
+        #----------------------------------------------
+        - name: init poetry env
+          if: success() && ${{ steps.install_poetry.outcome == 'success' }}
+          # if:failure() & steps.install_poetry.outcome == 'failure' }}
+          run: poetry init
+          shell: bash
+        - name: Install dependencies
+          if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+          run: |
+            poetry env use ${{ matrix.python-version }}
+            poetry lock --no-update
+            poetry install --no-interaction --no-root
+            echo "poetry done..."
+          shell: bash          
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
