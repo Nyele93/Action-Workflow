@@ -27,6 +27,8 @@ jobs:
           exclude:
             - python-version: 3.8
               operating-system: ubuntu-latest
+    env:
+      PLAYBOOK_DIR: ./playbooks/proj_name/
     runs-on: ${{ matrix.operating-system }}
     outputs:
       script-file: ${{ steps.write_py_file.outputs.py_output_file }}
@@ -97,57 +99,49 @@ jobs:
             compact_output=$(cat py_output.json | jq -c '.')
             echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
             echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
-          # poetry build
-          #working-directory: "./app"
-  deploy_ansible:
+        - name: install ansible and ansible-list with specific version.
+          run: |
+              source .venv/bin/activate
+              poetry env use ${{ matrix.python-version }}
+              poetry add ansible==2.14.0 ansible-lint==6.0.0 
+              ansible_version=$(ansible --version)
+              ansible_lint_version=$(ansible-lint --version)
+              echo "installed Ansible version: $ansible_version"  
+              echo "installed Ansible Lint version: $ansible_lint_version" 
+        - name: Output generated py file and playbook directory
+          run: |
+                echo "${{ steps.write_py_file.outputs.py_output_file }}"
+                echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"  
+
+  deploy_clickhouse:
     strategy:
       matrix:
-        python-version: ['3.9','3.10']     
+        clickhouse-cluster: ['production','stage2']     
     environment: ClickHouse-UAT
-    env:
-      PLAYBOOK_DIR: ./playbooks/proj_name/
-    needs: [deploy_python_macro]
     #container:
       #image:
       #env: 
     #services:
-      #ansible_service:
+      #clickhouse_service:
         #image:
         #ports:
         #  - 2489:2489
         #env:
     runs-on: ubuntu-latest
-    steps:
-      - name: install ansible and ansible-list with specific version.
+    steps:  
+      - name: check set ENV vars
         run: |
-          poetry env use ${{ matrix.python-version }}
-          poetry add ansible==2.14.0 ansible-lint==6.0.0 
-          ansible_version=$(ansible --version)
-          ansible_lint_version=$(ansible-lint --version)
-          echo "installed Ansible version: $ansible_version"  
-          echo "installed Ansible Lint version: $ansible_lint_version" 
-      - uses: actions/checkout@v4
-      #- name: install ansible-lint
-        #uses: ansible/ansible-lint@v6
-        # optional (see below):
-        #with:
-          #args: "-f full --fix=none --force-colour"
-          #setup_python: "true"
-          #working_directory: ""
-          #requirements_file: ""      
-      - name: Output generated py file and playbook directory
-        run: |
-          echo "${{ needs.deploy_python_macro.outputs.script-file }}"
-          echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"
           echo "loading environment secret: ${{ secrets.CH_UAT_USER_PASSWD }}"
+
   display_deployment_base_info:
-    needs: [deploy_python_macro, deploy_ansible]
+    needs: [deploy_python_macro, deploy_clickhouse]
     if: always()
     uses: ./.github/workflows/output.yml   ## reusable workflow
     with:
       artifact-name: "${{ needs.deploy_python_macro.outputs.script-file }}"
     #secrets:
       #reusable-secret: 
+
   display_deployment_outcome:
     needs: display_deployment_base_info
     runs-on: ubuntu-latest
