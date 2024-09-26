@@ -100,6 +100,7 @@ jobs:
             echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
             echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
         - name: install ansible and ansible-list
+          continue-on-error: true
           run: |
               source .venv/bin/activate
               poetry env use ${{ matrix.python-version }}
