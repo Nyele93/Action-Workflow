@@ -115,26 +115,28 @@ jobs:
         #env:
     runs-on: ubuntu-latest
     steps:
-      - name: install ansible
+      - name: install ansible and ansible-list with specific version.
         run: |
+          source .venv/bin/activate
+          poetry add ansible==2.14.0 ansible-lint==6.0.0 
           ansible_version=$(ansible --version)
+          ansible_lint_version=$(ansible-lint --version)
           echo "installed Ansible version: $ansible_version"  
+          echo "installed Ansible Lint version: $ansible_lint_version" 
       - uses: actions/checkout@v4
-      - name: install ansible-lint
-        uses: ansible/ansible-lint@v6
+      #- name: install ansible-lint
+        #uses: ansible/ansible-lint@v6
         # optional (see below):
-        with:
-          args: "-f full --fix=none --force-colour"
-          setup_python: "true"
-          working_directory: ""
+        #with:
+          #args: "-f full --fix=none --force-colour"
+          #setup_python: "true"
+          #working_directory: ""
           #requirements_file: ""      
       - name: Output generated py file and playbook directory
         run: |
           echo "${{ needs.deploy_python_macro.outputs.script-file }}"
           echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"
           echo "loading environment secret: ${{ secrets.CH_UAT_USER_PASSWD }}"
-      #- name: install ansible-lint
-      #  uses: ansible/ansible-lint@main
   display_deployment_base_info:
     needs: [deploy_python_macro, deploy_ansible]
     if: always()
