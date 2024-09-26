@@ -56,7 +56,7 @@ jobs:
           uses: actions/cache@v3
           with:
               path: ~/.local
-              key: poetry-local-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/*.yml') }}            
+              key: poetry-local-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}            
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
@@ -80,14 +80,14 @@ jobs:
         - name: init poetry env
           if: success() && ${{ steps.install_poetry.outcome == 'success' }}
           # if:failure() & steps.install_poetry.outcome == 'failure' }}
-          run: poetry init
+          run: poetry init --file ./pyproject.toml
           shell: bash
         - name: Install dependencies
           if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
           run: |
             poetry env use ${{ matrix.python-version }}
-            poetry lock --no-update
-            poetry install --no-interaction --no-root
+            poetry lock --no-update --file ./pyproject.toml
+            poetry install --no-interaction --no-root --file ./pyproject.toml
             echo "poetry done..."
           shell: bash          
         - name: run deploy_macro using poetry
@@ -104,7 +104,7 @@ jobs:
           run: |
               source .venv/bin/activate
               poetry env use ${{ matrix.python-version }}
-              poetry add ansible ansible-lint
+              poetry add ansible ansible-lint=={version = "^24.2.3", markers = "platform_system != 'Windows'"}
               #poetry add ansible==2.14 ansible-lint==6.0.0 
               ansible_version=$(ansible --version)
               ansible_lint_version=$(ansible-lint --version)

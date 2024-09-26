@@ -1,0 +1,3 @@
+[tool.poetry.dependencies]
+ansible = "10.4"
+ansible-lint = { version = "^24.2.3", markers = "platform_system != 'Windows'" }
