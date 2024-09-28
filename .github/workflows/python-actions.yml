@@ -30,6 +30,7 @@ jobs:
               operating-system: ubuntu-latest
     env:
       PLAYBOOK_DIR: ./playbooks/proj_name/
+      PROJECT_NAME: 'python_macro_deploy'
     runs-on: ${{ matrix.operating-system }}
     outputs:
       script-file: ${{ steps.write_py_file.outputs.py_output_file }}
@@ -40,11 +41,22 @@ jobs:
         - name: Get code
           uses: actions/checkout@v3
             #with:
-        - name: setup python
-          id: install-python
-          uses: actions/setup-python@v4
-          with: 
-            python-version: ${{ matrix.python-version }}
+        #- name: setup python
+          #id: install-python
+          #uses: actions/setup-python@v4
+          #with: 
+            #python-version ${{ matrix.python-version }}#
+        - name: Install pyenv
+          id: install_pyenv
+          run: |
+            curl https://pyenv.run | bash
+            echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bashrc
+            echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+            echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+            echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+            source ~/.bashrc
+        - name: Install Python using pyenv and matrix versions.
+          run: pyenv install ${{ matrix.python-version }}  
         #----------------------------------------------
         #------  cache Poetry and dependencies  -------
         #----------------------------------------------
@@ -53,12 +65,12 @@ jobs:
           uses: actions/cache@v4
           with:
             path: ~/.cache/pypoetry
-            key: poetry-cache-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+            key: poetry-cache-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ env.POETRY_VERSION }}
         - name: Cache Packages
           uses: actions/cache@v3
           with:
               path: ~/.local
-              key: poetry-local-${{ runner.os }}-${{ steps.install-python.outputs.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}            
+              key: poetry-local-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}            
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
@@ -68,10 +80,14 @@ jobs:
           id: install_poetry
           with:
             version: ${{ env.POETRY_VERSION }}
-            virtualenvs-create: true
+            virtualenvs-create: false
             virtualenvs-in-project: true
-            installer-parallel: true
             virtualenvs-path: .venv
+            installer-parallel: true
+        - name: create poetry project
+          if: success()
+          run: |
+               poetry new ${{ env.PROJECT_NAME }}
         #---------------------------------------------------------
         #   load cached venv if cache exists using custom actions
         #---------------------------------------------------------
@@ -84,14 +100,14 @@ jobs:
           if: success() && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           # if:failure() & steps.install_poetry.outcome == 'failure' }}
           run: |
-              poetry env use ${{ matrix.python-version }}
+              cd ${{ env.PROJECT_NAME }}
               poetry init --file ./pyproject.toml
-              
           shell: bash
         - name: Install dependencies
           if: steps.install_poetry.outcome == 'success'
           run: |
-            poetry env use ${{ matrix.python-version }}
+            pyenv global--{{ matrix.python-version }}
+            #poetry env use--{{ matrix.python-version }}
             poetry lock --no-update --file ./pyproject.toml
             poetry install --no-interaction --no-root --file ./pyproject.toml
             echo "poetry done..."
@@ -99,7 +115,7 @@ jobs:
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
-            source .venv/bin/activate
+            #source .venv/bin/activate
             poetry completions bash >> ~/.bash_completion
             poetry run python3 deploy_macro.py
             compact_output=$(cat py_output.json | jq -c '.')
@@ -108,8 +124,8 @@ jobs:
         - name: install ansible and ansible-list
           continue-on-error: true
           run: |
-              source .venv/bin/activate
-              poetry env use ${{ matrix.python-version }}
+              #source .venv/bin/activate
+              #--poetry env use--{{ matrix.python-version }}
               poetry add ansible ansible-lint=={version = "^24.2.3", markers = "platform_system != 'Windows'"}
               #poetry add ansible==2.14 ansible-lint==6.0.0 
               ansible_version=$(ansible --version)
