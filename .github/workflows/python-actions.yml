@@ -53,11 +53,9 @@ jobs:
             sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev 
             sudo apt install xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
             curl https://pyenv.run | bash
-            echo -e 'export PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-            echo -e 'eval "$(pyenv init --path)"\neval "$(pyenv init -)"' >> ~/.bashrc
-            echo -e 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
-            source ~/.bashrc
-            exec "$SHELL"
+            echo -e 'export PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_ENV
+            echo -e 'eval "$(pyenv init --path)"\neval "$(pyenv init -)"' >> $GITHUB_ENV
+            echo -e 'eval "$(pyenv virtualenv-init -)"' >> $GITHUB_ENV
         - name: Install Python using pyenv and matrix versions.
           run: pyenv install ${{ matrix.python-version }}  
         #----------------------------------------------
@@ -109,7 +107,7 @@ jobs:
         - name: Install dependencies
           if: steps.install_poetry.outcome == 'success'
           run: |
-            pyenv global--{{ matrix.python-version }}
+            pyenv global ${{ matrix.python-version }}
             #poetry env use--{{ matrix.python-version }}
             poetry lock --no-update --file ./pyproject.toml
             poetry install --no-interaction --no-root --file ./pyproject.toml
