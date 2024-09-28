@@ -46,21 +46,28 @@ jobs:
           #uses: actions/setup-python@v4
           #with: 
             #python-version ${{ matrix.python-version }}#
-        - name: Install pyenv
-          id: install_pyenv
+        - name: Install pyenv and Python using pyenv and matrix versions.
+          id: install_pyenv_and_python
           run: |
+            # install neccessary packages.
             sudo apt update
             sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev 
             sudo apt install xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
+            # install pyenv.
             curl https://pyenv.run | bash
+
+            # set environment variables.
             echo -e 'export PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_ENV
             echo -e '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_ENV
-        - name: Install Python using pyenv and matrix versions.
-          run: |
+
+            # initialize pyenv.
             echo -e 'eval "$(pyenv init --path)"' >> ~/.bashrc
             echo -e 'eval "$(pyenv init -)"' >> ~/.bashrc
             echo -e 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
             source ~/.bashrc
+
+            # Install specific Python version
             pyenv install ${{ matrix.python-version }}  
         #----------------------------------------------
         #------  cache Poetry and dependencies  -------
@@ -111,21 +118,37 @@ jobs:
         - name: Install dependencies
           if: steps.install_poetry.outcome == 'success'
           run: |
-            pyenv global ${{ matrix.python-version }}
-            #poetry env use--{{ matrix.python-version }}
-            poetry lock --no-update --file ./pyproject.toml
-            poetry install --no-interaction --no-root --file ./pyproject.toml
-            echo "poetry done..."
+             # Initialize pyenv for this step
+             eval "$(pyenv init --path)"
+             eval "$(pyenv init -)"
+             eval "$(pyenv virtualenv-init -)"
+             pyenv global ${{ matrix.python-version }}
+             #poetry env use--{{ matrix.python-version }}
+             poetry lock --no-update --file ./pyproject.toml
+             poetry install --no-interaction --no-root --file ./pyproject.toml
+             echo "poetry done..."
+          env:
+              PYENV_ROOT: ${{ github.workspace }}/.pyenv
+              PATH: ${{ github.workspace }}/.pyenv/bin:$PATH
           shell: bash          
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
-            #source .venv/bin/activate
+            #--source .venv/bin/activate
+            # Initialize pyenv for this step
+            eval "$(pyenv init --path)"
+            eval "$(pyenv init -)"
+            eval "$(pyenv virtualenv-init -)"
+            pyenv global ${{ matrix.python-version }}
+
             poetry completions bash >> ~/.bash_completion
             poetry run python3 deploy_macro.py
             compact_output=$(cat py_output.json | jq -c '.')
             echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
             echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
+          env:
+            PYENV_ROOT: ${{ github.workspace }}/.pyenv
+            PATH: ${{ github.workspace }}/.pyenv/bin:$PATH
         - name: install ansible and ansible-list
           continue-on-error: true
           run: |
