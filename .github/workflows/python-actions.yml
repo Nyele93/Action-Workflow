@@ -81,7 +81,7 @@ jobs:
         # install dependencies if cache does not exist
         #----------------------------------------------
         - name: init poetry env
-          if: success() && ${{ steps.cached-poetry-dependencies.outputs.cache-hit != 'true' }}
+          if: success() && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           # if:failure() & steps.install_poetry.outcome == 'failure' }}
           run: |
               poetry env use ${{ matrix.python-version }}
