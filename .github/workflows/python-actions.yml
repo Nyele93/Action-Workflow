@@ -68,7 +68,7 @@ jobs:
             virtualenvs-create: true
             virtualenvs-in-project: true
             #virtualenvs-path: ~/my-custom-path
-            #installer-parallel: true  #Async.
+            installer-parallel: true
         #---------------------------------------------------------
         #   load cached venv if cache exists using custom actions
         #---------------------------------------------------------
