@@ -84,6 +84,7 @@ jobs:
           if: success() && ${{ steps.cached-poetry-dependencies.outputs.cache-hit != 'true' }}
           # if:failure() & steps.install_poetry.outcome == 'failure' }}
           run: |
+              poetry env use ${{ matrix.python-version }}
               poetry init --file ./pyproject.toml
               
           shell: bash
