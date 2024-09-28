@@ -81,12 +81,14 @@ jobs:
         # install dependencies if cache does not exist
         #----------------------------------------------
         - name: init poetry env
-          if: success() && ${{ steps.install_poetry.outcome == 'success' }}
+          if: success() && ${{ steps.cached-poetry-dependencies.outputs.cache-hit != 'true' }}
           # if:failure() & steps.install_poetry.outcome == 'failure' }}
-          run: poetry init --file ./pyproject.toml
+          run: |
+              poetry init --file ./pyproject.toml
+              
           shell: bash
         - name: Install dependencies
-          if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+          if: steps.install_poetry.outcome == 'success'
           run: |
             poetry env use ${{ matrix.python-version }}
             poetry lock --no-update --file ./pyproject.toml
