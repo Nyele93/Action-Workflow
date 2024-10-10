@@ -67,6 +67,7 @@ jobs:
             eval "$(pyenv init --path)"
             eval "$(pyenv virtualenv-init -)"
             source ~/.bashrc
+            exec $SHELL
             # Install specific Python version
             pyenv install ${{ matrix.python-version }}  
         #----------------------------------------------
