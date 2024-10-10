@@ -63,7 +63,9 @@ jobs:
         - name: install python in virtual env using pyenv
           id: pyenv_install_python
           run: |
-              git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
+              if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]; then
+                 git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
+              fi
               # set environment variables.
               echo -e 'export PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_ENV
               echo -e '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_ENV
