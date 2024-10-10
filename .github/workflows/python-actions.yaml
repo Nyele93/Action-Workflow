@@ -95,7 +95,7 @@ jobs:
             version: ${{ env.POETRY_VERSION }}
             virtualenvs-create: false
             virtualenvs-in-project: true
-            virtualenvs-path: .venv
+            #virtualenvs-path: .venv
             installer-parallel: true
         - name: create poetry project
           if: success()

@@ -2,5 +2,6 @@
 .vscode/*
 !.vscode/extensions.json
 .idea
+.yamllint
 .DS_Store
 *.suo
