@@ -83,14 +83,13 @@ jobs:
           id: install_poetry
           if: steps.cached_poetry_install.outputs.cache-hit != 'true'            
           run: |
-                echo $GITHUB_PATH
-                echo $GITHUB_ENV
+                source ~/.bashrc
                 curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python3 -
                 # Configure Poetry settings
-                poetry config virtualenvs.create false
-                poetry config virtualenvs.in-project true
-                poetry config virtualenvs.path .venv
-                poetry config installer.parallel true
+                #poetry config virtualenvs.create false
+                #poetry config virtualenvs.in-project true
+                #poetry config virtualenvs.path .venv
+                #poetry config installer.parallel true
         - name: create poetry project
           if: success()
           run: |
