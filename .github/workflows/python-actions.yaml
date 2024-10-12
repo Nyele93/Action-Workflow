@@ -60,21 +60,22 @@ jobs:
                curl https://pyenv.run | bash
 
                # set environment variables.
-               echo -e 'export PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_PATH
-               echo -e '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_PATH                 
+               echo -e 'PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> "${GITHUB_env}"
                PYENV_ROOT="$HOME/.pyenv"
                PYENV_BIN="$PYENV_ROOT/bin"
-               echo "$PYENV_BIN" >> $GITHUB_PATH
-               echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
+               echo "$PYENV_BIN" >> "${GITHUB_PATH}"
                if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]; then
                     git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
                fi
+               eval "$(pyenv init -)" >> "${GITHUB_PATH}"
+               eval "$(pyenv init --path)" >> "${GITHUB_PATH}"
+               eval "$(pyenv virtualenv-init -)" >> "${GITHUB_PATH}"
+        - name: setup virtualenv using pyenv
+          shell: bash
+          id: setup_virtualenv_using_pyenv
+          run: |              
                source ~/.bashrc
-               eval "$(pyenv init -)"
-               eval "$(pyenv init --path)"
-               eval "$(pyenv virtualenv-init -)"
                # Install specific Python version
-               #exec $SHELL
                echo "$(which pyenv)"
                pyenv install ${{ matrix.python-version }} 
                echo "$(python3 --version)"
