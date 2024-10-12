@@ -64,12 +64,12 @@ jobs:
                if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]; then
                     git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
                fi
-               exec $SHELL
+               source ~/.bashrc
                eval "$(pyenv init -)"
                eval "$(pyenv init --path)"
                eval "$(pyenv virtualenv-init -)"
                # Install specific Python version
-               exec $SHELL
+               #exec $SHELL
                echo "$(which pyenv)"
                pyenv install ${{ matrix.python-version }} 
                echo "$(python3 --version)"
