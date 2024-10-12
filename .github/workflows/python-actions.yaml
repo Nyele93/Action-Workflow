@@ -115,7 +115,7 @@ jobs:
         - name: setup poetry project and Install dependencies
           if: steps.install_poetry.outcome == 'success' && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           run: |
-             mkdir cd ${{ env.PROJECT_NAME }} && cd $_
+             mkdir ${{ env.PROJECT_NAME }} && cd $_
              pyenv local ${{ matrix.python-version }}
              poetry init --file ./pyproject.toml
              #poetry env use {{ matrix.python-version }}
