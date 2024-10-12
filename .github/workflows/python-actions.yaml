@@ -59,6 +59,7 @@ jobs:
                export PYENV_ROOT="$HOME/.pyenv"
                PYENV_BIN="$PYENV_ROOT/bin"
                echo "$PYENV_BIN" >>"$GITHUB_PATH"
+               echo 'export PYENV_ROOT="$HOME/.pyenv"' >>"$GITHUB_ENV"
                if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]; then
                     git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
                fi
