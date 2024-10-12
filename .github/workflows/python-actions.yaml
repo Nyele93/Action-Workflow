@@ -77,7 +77,6 @@ jobs:
 
                # Install specific Python version
                echo "$(which pyenv)"
-               pyenv uninstall ${{ matrix.python-version }} 
                pyenv install -v ${{ matrix.python-version }} 
                echo "$(python3 --version)"
         #----------------------------------------------
