@@ -73,11 +73,11 @@ jobs:
                # install neccessary packages.
                sudo apt update
                sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev 
-               sudo apt install -y xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev
+               sudo apt install -y xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev git
 
                # Install specific Python version
                echo "$(which pyenv)"
-               pyenv install -v ${{ matrix.python-version }} 
+               pyenv install -v -f ${{ matrix.python-version }} 
                echo "$(python3 --version)"
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
