@@ -55,8 +55,7 @@ jobs:
                curl https://pyenv.run | bash
 
                # set environment variables.
-               echo 'PYENV_ROOT="$HOME/.pyenv"' >>"$GITHUB_ENV"
-               echo 'PATH="$PYENV_ROOT/bin:$PATH"' >>"$GITHUB_ENV"
+               echo -e 'PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >>"$GITHUB_ENV"
                PYENV_ROOT="$HOME/.pyenv"
                PYENV_BIN="$PYENV_ROOT/bin"
                echo "$PYENV_BIN" >>"$GITHUB_PATH"
@@ -68,12 +67,12 @@ jobs:
           id: install_python_matrix_using_pyenv
           run: | 
                source ~/.bashrc
-               eval "$(pyenv init --path)"
-               eval "$(pyenv init -)"
-               eval "$(pyenv virtualenv-init -)"       
+               eval "$(pyenv init -)" >>"$GITHUB_PATH"
+               eval "$(pyenv init --path)" >>"$GITHUB_PATH"
+               eval "$(pyenv virtualenv-init -)" >>"$GITHUB_PATH"            
                # install neccessary packages.
                sudo apt update
-               sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev git 
+               sudo apt install --install-suggests -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev git 
                
                # Install specific Python version
                pyenv install -v -f ${{ matrix.python-version }} 
