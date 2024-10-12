@@ -80,15 +80,15 @@ jobs:
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
         - name: install poetry
-          uses: snok/install-poetry@v1
-          #if:steps.cached_poetry_install.outputs.cache-hit != 'true'
           id: install_poetry
-          with:
-            version: ${{ env.POETRY_VERSION }}
-            virtualenvs-create: false
-            virtualenvs-in-project: true
-            virtualenvs-path: .venv
-            installer-parallel: true
+          if: steps.cached_poetry_install.outputs.cache-hit != 'true'            
+          run: |
+                curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python3 -
+                # Configure Poetry settings
+                poetry config virtualenvs.create false
+                poetry config virtualenvs.in-project true
+                poetry config virtualenvs.path .venv
+                poetry config installer.parallel true
         - name: create poetry project
           if: success()
           run: |
