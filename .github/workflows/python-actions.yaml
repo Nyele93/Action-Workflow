@@ -47,8 +47,8 @@ jobs:
           #uses: actions/setup-python@v4
           #with: 
             #python-version ${{ matrix.python-version }}#
-        - name: Install pyenv and Python using pyenv and matrix versions.
-          id: install_pyenv_and_python
+        - name: Install pyenv
+          id: install_pyenv
           shell: bash
           run: |
                # install pyenv.
@@ -62,14 +62,14 @@ jobs:
                if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]; then
                     git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
                fi
+        - name: install python matrix using pyenv
+          shell: bash
+          id: install_python_matrix_using_pyenv
+          run: | 
+               source ~/.bashrc
                eval "$(pyenv init -)" >>"$GITHUB_PATH"
                eval "$(pyenv init --path)" >>"$GITHUB_PATH"
-               eval "$(pyenv virtualenv-init -)" >>"$GITHUB_PATH"
-        - name: setup virtualenv using pyenv
-          shell: bash
-          id: setup_virtualenv_using_pyenv
-          run: |              
-               source ~/.bashrc
+               eval "$(pyenv virtualenv-init -)" >>"$GITHUB_PATH"            
                # install neccessary packages.
                sudo apt update
                sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev 
