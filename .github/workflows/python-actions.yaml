@@ -55,19 +55,17 @@ jobs:
                curl https://pyenv.run | bash
 
                # set environment variables.
-               echo -e 'PYENV_ROOT=$HOME/.pyenv\nexport PATH=$PYENV_ROOT/bin:$PATH' >>"$GITHUB_ENV"
-               export PYENV_ROOT="$HOME/.pyenv"
-               PYENV_BIN="$PYENV_ROOT/bin"
-               echo "$PYENV_BIN" >>"$GITHUB_PATH"
+               echo -e 'export PYENV_ROOT="${HOME}/.pyenv"\nexport PATH="{$PYENV_ROOT}/bin:${PATH}"' >>"$GITHUB_ENV"
+               export PYENV_ROOT="${HOME}/.pyenv"
+               export PYENV_BIN=$PYENV_ROOT/bin
+               echo "${PYENV_BIN}" >>"$GITHUB_PATH"
                if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]; then
                     git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
                fi
         - name: install python matrix using pyenv
           shell: bash
           id: install_python_matrix_using_pyenv
-          run: | 
-               echo $PATH
-               echo $PYENV_ROOT
+          run: |
                source ~/.bashrc
                eval "$(pyenv init -)" >>"$GITHUB_PATH"
                eval "$(pyenv virtualenv-init -)" >>"$GITHUB_PATH"            
