@@ -17,6 +17,7 @@ on:
 
 env:
   POETRY_VERSION: "1.5.1"
+  ACTIONS_RUNNER_DEBUG: 'true'
   
 jobs: 
   deploy_python_macro:
