@@ -83,7 +83,8 @@ jobs:
           id: install_poetry
           if: steps.cached_poetry_install.outputs.cache-hit != 'true'            
           run: |
-                env
+                echo $GITHUB_PATH
+                echo $GITHUB_ENV
                 curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python3 -
                 # Configure Poetry settings
                 poetry config virtualenvs.create false
