@@ -69,7 +69,8 @@ jobs:
                eval "$(pyenv init --path)"
                eval "$(pyenv virtualenv-init -)"
                # Install specific Python version
-               #exec $SHELL
+               exec $SHELL
+               which pyenv
                pyenv install ${{ matrix.python-version }}  
         #----------------------------------------------
         #------  cache Poetry and dependencies  -------
