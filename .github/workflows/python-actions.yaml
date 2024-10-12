@@ -77,7 +77,7 @@ jobs:
                source ~/.bashrc
                # Install specific Python version
                echo "$(which pyenv)"
-               pyenv -v install ${{ matrix.python-version }} 
+               pyenv install ${{ matrix.python-version }} 
                echo "$(python3 --version)"
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
