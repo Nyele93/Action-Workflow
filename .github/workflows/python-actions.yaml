@@ -66,9 +66,10 @@ jobs:
           shell: bash
           id: install_python_matrix_using_pyenv
           run: | 
+               echo $PATH
+               echo $PYENV_ROOT
                source ~/.bashrc
                eval "$(pyenv init -)" >>"$GITHUB_PATH"
-               eval "$(pyenv init --path)" >>"$GITHUB_PATH"
                eval "$(pyenv virtualenv-init -)" >>"$GITHUB_PATH"            
                # install neccessary packages.
                sudo apt update
