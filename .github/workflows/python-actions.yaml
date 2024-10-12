@@ -70,13 +70,15 @@ jobs:
                eval "$(pyenv virtualenv-init -)"
                # Install specific Python version
                exec $SHELL
-               pyenv install ${{ matrix.python-version }}  
+               echo "$(which pyenv)"
+               pyenv install ${{ matrix.python-version }} 
+               echo "$(python3 --version)"
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
         - name: install poetry
           uses: snok/install-poetry@v1
-          if: steps.cached_poetry_install.outputs.cache-hit != 'true'
+          #if:steps.cached_poetry_install.outputs.cache-hit != 'true'
           id: install_poetry
           with:
             version: ${{ env.POETRY_VERSION }}
