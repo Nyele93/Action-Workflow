@@ -70,22 +70,7 @@ jobs:
                eval "$(pyenv virtualenv-init -)"
                # Install specific Python version
                exec $SHELL
-               which pyenv
                pyenv install ${{ matrix.python-version }}  
-        #----------------------------------------------
-        #------  cache Poetry and dependencies  -------
-        #----------------------------------------------
-        - name: Cache poetry installation
-          id: cached_poetry_install
-          uses: actions/cache@v4
-          with:
-            path: ~/.cache/pypoetry
-            key: poetry-cache-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ env.POETRY_VERSION }}
-        - name: Cache Packages
-          uses: actions/cache@v3
-          with:
-              path: ~/.local
-              key: poetry-local-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}            
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
@@ -105,6 +90,20 @@ jobs:
                pyenv global ${{ matrix.python-version }}
                poetry shell
                poetry new ${{ env.PROJECT_NAME }}
+        #----------------------------------------------
+        #------  cache Poetry and dependencies  -------
+        #----------------------------------------------
+        - name: Cache poetry installation
+          id: cached_poetry_install
+          uses: actions/cache@v4
+          with:
+            path: ~/.cache/pypoetry
+            key: poetry-cache-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ env.POETRY_VERSION }}
+        - name: Cache Packages
+          uses: actions/cache@v3
+          with:
+              path: ~/.local
+              key: poetry-local-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}                           
         #---------------------------------------------------------
         #   load cached venv if cache exists using custom actions
         #---------------------------------------------------------
