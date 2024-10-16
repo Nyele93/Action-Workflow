@@ -116,7 +116,8 @@ jobs:
           shell: bash
           if: steps.install_poetry.outcome == 'success' && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           run: |
-             mkdir ${{ env.PROJECT_NAME }} && cd $_
+             mkdir -p ${{ env.PROJECT_NAME }}
+             cd ${{ env.PROJECT_NAME }}
              pyenv local ${{ matrix.python-version }}
              poetry init --file ./pyproject.toml
              #poetry env use {{ matrix.python-version }}
