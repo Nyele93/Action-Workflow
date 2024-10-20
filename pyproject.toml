@@ -1,9 +1,11 @@
 [tool.poetry.dependencies]
-ansible = "10.4"
+ansible = "^10.5"
 ansible-lint = { version = "^24.2.3", markers = "platform_system != 'Windows'" }
+pyyaml = "^5.1.2"
+jinja2 = "^2.10.3"
 
 [tool.poetry]
-version = "1.0.0"
+version = "1.5.1"
 description = "Python macro deploy."
 authors = ["Michael Amadi <amadimicheal212@gmail.com>"]
 readme = "README.md"

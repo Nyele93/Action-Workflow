@@ -74,8 +74,7 @@ jobs:
                sudo apt install --install-suggests -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev git 
                
                # Install specific Python version
-               pyenv install ${{ matrix.python-version }} 
-               python3 --version
+               pyenv install ${{ matrix.python-version }}
         #------------------------------------------------------------------------------------
         #   load cached poetry install and dependencies if cache exists using custom actions
         #-------------------------------------------------------------------------------------
@@ -119,9 +118,8 @@ jobs:
               source ~/.bashrc
               cd ${{ env.PROJECT_NAME }}
               poetry install --no-interaction --no-root
-              #poetry add ansible ansible-lint=={version = "^24.2.3", markers = "platform_system != 'Windows'"}
-              ansible_version=$(ansible --version)
-              ansible_lint_version=$(ansible-lint --version)
+              ansible_version=$(poetry run ansible --version)
+              ansible_lint_version=$(poetry run ansible-lint --version)
               echo "installed Ansible version: $ansible_version"  
               echo "installed Ansible Lint version: $ansible_lint_version" 
         - name: Output generated py file and playbook directory
