@@ -112,8 +112,9 @@ jobs:
         #----------------------------------------------
         # install dependencies if cache does not exist
         #----------------------------------------------
-        - name: setup poetry project and Install dependencies
+        - name: setup poetry project, Install dependencies and run deploy_macro.py
           if: steps.install_poetry.outcome == 'success' && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
+          id: write_py_file
           run: |
              source ~/.bashrc
              mkdir -p ${{ env.PROJECT_NAME }}
@@ -123,35 +124,18 @@ jobs:
              poetry init
              #poetry env use {{ matrix.python-version }}
              poetry install --no-interaction --no-root
+             #poetry completions bash >> ~/.bash_completion
              poetry lock --no-update
-             echo "poetry done..."
+             poetry run python3 deploy_macro.py
+             compact_output=$(cat py_output.json | jq -c '.')
+             echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
+             echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
           env:
-              PYENV_ROOT: ${{ github.workspace }}/.pyenv       
-        - name: run deploy_macro using poetry
-          id: write_py_file
-          run: |
-            #--source .venv/bin/activate
-            # Initialize pyenv for this step
-            eval "$(pyenv init --path)"
-            eval "$(pyenv init -)"
-            eval "$(pyenv virtualenv-init -)"
-            pyenv global ${{ matrix.python-version }}
-
-            poetry completions bash >> ~/.bash_completion
-            poetry run python3 deploy_macro.py
-            compact_output=$(cat py_output.json | jq -c '.')
-            echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
-            echo "loading workflow secret: ${{ secrets.ACTIONS_WORKFLOW_SECRET }}"
-          env:
-            PYENV_ROOT: ${{ github.workspace }}/.pyenv
-            PATH: ${{ github.workspace }}/.pyenv/bin:$PATH
-        - name: install ansible and ansible-list
+              PYENV_ROOT: ${{ github.workspace }}/.pyenv
+        - name: install ansible and ansible-lint
           continue-on-error: true
           run: |
-              #source .venv/bin/activate
-              #--poetry env use--{{ matrix.python-version }}
               poetry add ansible ansible-lint=={version = "^24.2.3", markers = "platform_system != 'Windows'"}
-              #poetry add ansible==2.14 ansible-lint==6.0.0 
               ansible_version=$(ansible --version)
               ansible_lint_version=$(ansible-lint --version)
               echo "installed Ansible version: $ansible_version"  
