@@ -55,10 +55,10 @@ jobs:
                curl https://pyenv.run | bash
 
                # set environment variables.
-               echo -e "export PYENV_ROOT=${HOME}/.pyenv\nexport PATH=${HOME}/.pyenv/bin:${PATH}" >>"$GITHUB_ENV"
+               echo -e "export PYENV_ROOT=${HOME}/.pyenv\nexport PATH=${HOME}/.pyenv/bin:${PATH}" >> "$GITHUB_ENV"
                PYENV_ROOT="${HOME}/.pyenv"
                PYENV_BIN=$PYENV_ROOT/bin
-               echo "${PYENV_BIN}" >>"$GITHUB_PATH"
+               echo "${PYENV_BIN}" >> "$GITHUB_PATH"
                if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ]; then
                     git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
                fi
@@ -67,8 +67,8 @@ jobs:
           id: install_python_matrix_using_pyenv
           run: |
                source ~/.bashrc
-               eval "$(pyenv init -)" >>"$GITHUB_PATH"
-               eval "$(pyenv virtualenv-init -)" >>"$GITHUB_PATH"            
+               eval "$(pyenv init -)" >> "$GITHUB_PATH"
+               eval "$(pyenv virtualenv-init -)" >> "$GITHUB_PATH"            
                # install neccessary packages.
                sudo apt update
                sudo apt install --install-suggests -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev git 
@@ -129,7 +129,7 @@ jobs:
              echo "poetry done..."
           env:
               PYENV_ROOT: ${{ github.workspace }}/.pyenv
-              PATH: ${{ github.workspace }}/.pyenv/bin:$PATH        
+              #PATH:{{ github.workspace }}/.pyenv/bin:$PATH        
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
