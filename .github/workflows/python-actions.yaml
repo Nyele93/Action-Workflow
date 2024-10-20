@@ -116,6 +116,9 @@ jobs:
           shell: bash
           if: steps.install_poetry.outcome == 'success' && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           run: |
+             source ~/.bashrc
+             sudo which mkdir
+             which mkdir
              mkdir -p ${{ env.PROJECT_NAME }}
              cd ${{ env.PROJECT_NAME }}
              pyenv local ${{ matrix.python-version }}
