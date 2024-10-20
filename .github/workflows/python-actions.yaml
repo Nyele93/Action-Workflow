@@ -74,7 +74,7 @@ jobs:
                sudo apt install --install-suggests -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev git 
                
                # Install specific Python version
-               pyenv install -v -f ${{ matrix.python-version }} 
+               pyenv install ${{ matrix.python-version }} 
                python3 --version
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
@@ -116,10 +116,9 @@ jobs:
           if: steps.install_poetry.outcome == 'success' && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           run: |
              source ~/.bashrc
-             which mkdir
-             env
              mkdir -p ${{ env.PROJECT_NAME }}
              cd ${{ env.PROJECT_NAME }}
+             pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
              poetry init --file ./pyproject.toml
              #poetry env use {{ matrix.python-version }}
