@@ -122,13 +122,12 @@ jobs:
              pyenv local ${{ matrix.python-version }}
              poetry init --file ./pyproject.toml
              #poetry env use {{ matrix.python-version }}
-             poetry lock --no-update --file ./pyproject.toml
-             poetry install --no-interaction --no-root --file ./pyproject.toml
+             poetry install --no-interaction --no-root
+             poetry lock --no-update
              poetry shell
              echo "poetry done..."
           env:
-              PYENV_ROOT: ${{ github.workspace }}/.pyenv
-              #PATH:{{ github.workspace }}/.pyenv/bin:$PATH        
+              PYENV_ROOT: ${{ github.workspace }}/.pyenv       
         - name: run deploy_macro using poetry
           id: write_py_file
           run: |
