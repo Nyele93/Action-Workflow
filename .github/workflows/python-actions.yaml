@@ -120,7 +120,7 @@ jobs:
              cd ${{ env.PROJECT_NAME }}
              pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
-             poetry init --file ./pyproject.toml
+             poetry init
              #poetry env use {{ matrix.python-version }}
              poetry install --no-interaction --no-root
              poetry lock --no-update
