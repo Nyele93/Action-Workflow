@@ -134,14 +134,17 @@ jobs:
           env:
               PYENV_ROOT: ${{ github.workspace }}/.pyenv
         - name: install ansible and ansible-lint
-          continue-on-error: true
+          continue-on-error: false
           run: |
+              source ~/.bashrc
+              cd ${{ env.PROJECT_NAME }}
               poetry add ansible ansible-lint=={version = "^24.2.3", markers = "platform_system != 'Windows'"}
               ansible_version=$(ansible --version)
               ansible_lint_version=$(ansible-lint --version)
               echo "installed Ansible version: $ansible_version"  
               echo "installed Ansible Lint version: $ansible_lint_version" 
         - name: Output generated py file and playbook directory
+          continue-on-error: true
           run: |
                 echo "${{ steps.write_py_file.outputs.py_output_file }}"
                 echo "playbook directory set to: ${{ env.PLAYBOOK_DIR }}"  
