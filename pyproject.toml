@@ -1,16 +1,21 @@
-[tool.poetry.dependencies]
-ansible = "^10.5"
-ansible-lint= "^24.2.3"
-#ansible-lint = {version = "^24.2.3", markers = "platform_system != 'Windows'"}
-pyyaml = "^5.1.2"
-jinja2 = "^2.10.3"
-
 [tool.poetry]
+name = "Ansible-deploy-gha"
 version = "1.5.1"
 description = "Python macro deploy."
 authors = ["Michael Amadi <amadimicheal212@gmail.com>"]
 readme = "README.md"
 package-mode = false
+
+[tool.poetry.dependencies]
+ansible = "^10.5"
+ansible-lint = {version = "^5.4.0", markers = "platform_system != 'Windows'"}
+pyyaml = "^5.1.2"
+jinja2 = "^2.10.3"
+
+[tool.poetry.group.dev.dependencies]
+
+pylint = "^2.15.7
+pre-commit = "^2.20.0"
 
 [build-system]
 requires = ["poetry-core"]
