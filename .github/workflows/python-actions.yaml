@@ -80,7 +80,7 @@ jobs:
         #-------------------------------------------------------------------------------------
         - name: Load & cache dependencies
           id: cache_install_deps
-          uses: ./.github/workflows/cache-deps.yml   ## reusable workflow
+          uses: ./.github/workflows/check-cache-deps.yml   ## reusable workflow
           with:
             caching: 'true'
         #----------------------------------------------
