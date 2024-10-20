@@ -118,6 +118,7 @@ jobs:
           run: |
              source ~/.bashrc
              mkdir -p ${{ env.PROJECT_NAME }}
+             cp ./deploy_macro.py "${{ env.PROJECT_NAME }}"/
              cd ${{ env.PROJECT_NAME }}
              pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
@@ -126,7 +127,6 @@ jobs:
              poetry install --no-interaction --no-root
              #poetry completions bash >> ~/.bash_completion
              poetry lock --no-update
-             cp deploy_macro.py "${{ env.PROJECT_NAME }}"/
              poetry run python3 deploy_macro.py
              compact_output=$(cat py_output.json | jq -c '.')
              echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
