@@ -120,10 +120,10 @@ jobs:
               poetry config installer.parallel true
               poetry config installer.max-workers 5
               poetry install --no-interaction --no-root
-              poetry run ansible --version
-              poetry run ansible-lint --version
-              #echo "installed Ansible version: $ansible_version"  
-              #echo "installed Ansible Lint version: $ansible_lint_version" 
+              ansible_version=$(poetry run ansible --version)
+              ansible_lint_version=$(poetry run ansible-lint --version)
+              echo "installed Ansible version: $ansible_version"  
+              echo "installed Ansible Lint version: $ansible_lint_version" 
         - name: Output generated py file and playbook directory
           continue-on-error: true
           run: |
