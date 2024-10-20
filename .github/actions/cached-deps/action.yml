@@ -1,21 +1,17 @@
 name: 'Get_Cache_Dependencies'
 description: 'Get the Dependencies and Cache them'
+inputs:
+  caching:
+    description: 'whether to cache dependencies or not'
+    required: true
+    default: 'true'
 runs:
   using: 'composite'
   steps:
     #----------------------------------------------
     #------  cache Poetry and dependencies  -------
     #----------------------------------------------  
-    - name: Cache poetry installation
-      id: cached_poetry_install
-      uses: actions/cache@v4
-      with:
-          path: ~/.cache/pypoetry
-          key: poetry-cache-${{ runner.os }}-${{ matrix.python-version }}-${{ env.POETRY_VERSION }} 
-    - name: Cache Packages
-      uses: actions/cache@v4
-      with:
-          path: ~/.local
-          key: poetry-local-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}
-
-
+    - name: Check custom action
+      shell: bash
+      run: |
+        echo "Custom Action working..."

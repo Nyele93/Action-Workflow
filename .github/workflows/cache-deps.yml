@@ -1,0 +1,48 @@
+name: 'Get_Cache_Dependencies'
+on: 
+    workflow_call:
+        inputs:
+           caching:
+            description: 'whether to cache dependencies or not'
+            required: true
+            default: 'true'
+            type: string
+        outputs:
+            cache_result:
+              description: The result of the cache check.
+              value: ${{ jobs.cache_install_and_dependencies.outputs.cache_check }}          
+
+env:
+  POETRY_VERSION: "1.5.1"
+  ACTIONS_RUNNER_DEBUG: 'true'
+
+jobs:
+  cache_install_and_dependencies:
+    outputs:
+       cache_check: ${{ steps.cached_dependencies.outputs.cache-hit }}    
+    continue-on-error: false
+    timeout-minutes: 5
+    runs-on: ubuntu-latest 
+    strategy:
+        fail-fast: false
+        matrix:
+          python-version: ['3.9','3.10']  # Choose compatible versions
+    steps:
+    #----------------------------------------------
+    #------  cache Poetry and dependencies  -------
+    #----------------------------------------------  
+    - name: Cache poetry installation
+      if: inputs.caching == 'true'
+      id: cached_poetry_install
+      uses: actions/cache@v4
+      with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ matrix.python-version }}-${{ env.POETRY_VERSION }} 
+    - name: Cache Packages
+      id: cached_dependencies
+      uses: actions/cache@v4
+      with:
+          path: ~/.local
+          key: poetry-local-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}
+
+

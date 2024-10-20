@@ -79,13 +79,16 @@ jobs:
         #   load cached poetry install and dependencies if cache exists using custom actions
         #-------------------------------------------------------------------------------------
         - name: Load & cache dependencies
-          uses: ./.github/actions/cached-deps
+          id: cache_install_deps
+          uses: ./.github/workflows/cache-deps.yml   ## reusable workflow
+          with:
+            caching: 'true'
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
         - name: install poetry
           id: install_poetry
-          if: steps.cached_poetry_install.outputs.cache-hit != 'true'            
+          if: steps.cache_install_deps.outputs.cache_result != 'true'
           run: |
                 source ~/.bashrc
                 curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python3 -            
