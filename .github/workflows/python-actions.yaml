@@ -76,6 +76,11 @@ jobs:
                # Install specific Python version
                pyenv install ${{ matrix.python-version }} 
                python3 --version
+        #------------------------------------------------------------------------------------
+        #   load cached poetry install and dependencies if cache exists using custom actions
+        #-------------------------------------------------------------------------------------
+        - name: Load & cache dependencies
+          uses: ./.github/actions/cached-deps
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
@@ -84,36 +89,11 @@ jobs:
           if: steps.cached_poetry_install.outputs.cache-hit != 'true'            
           run: |
                 source ~/.bashrc
-                curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python3 -
-                # Configure Poetry settings
-                #poetry config virtualenvs.create=false
-                #poetry config virtualenvs.in-project=true
-                #poetry config virtualenvs.path .venv
-                #poetry config installer.parallel true
-        #----------------------------------------------
-        #------  cache Poetry and dependencies  -------
-        #----------------------------------------------
-        - name: Cache poetry installation
-          id: cached_poetry_install
-          uses: actions/cache@v4
-          with:
-            path: ~/.cache/pypoetry
-            key: poetry-cache-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ env.POETRY_VERSION }}
-        - name: Cache Packages
-          uses: actions/cache@v3
-          with:
-              path: ~/.local
-              key: poetry-local-${{ runner.os }}-${{ steps.install_pyenv.outputs.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}                           
-        #---------------------------------------------------------
-        #   load cached venv if cache exists using custom actions
-        #---------------------------------------------------------
-        - name: Load & cache dependencies
-          uses: ./.github/actions/cached-deps
+                curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python3 -            
         #----------------------------------------------
         # install dependencies if cache does not exist
         #----------------------------------------------
         - name: setup poetry project, Install dependencies and run deploy_macro.py
-          if: steps.install_poetry.outcome == 'success' && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           id: write_py_file
           run: |
              source ~/.bashrc
@@ -138,7 +118,8 @@ jobs:
           run: |
               source ~/.bashrc
               cd ${{ env.PROJECT_NAME }}
-              poetry add ansible ansible-lint=={version = "^24.2.3", markers = "platform_system != 'Windows'"}
+              poetry install --no-interaction --no-root
+              #poetry add ansible ansible-lint=={version = "^24.2.3", markers = "platform_system != 'Windows'"}
               ansible_version=$(ansible --version)
               ansible_lint_version=$(ansible-lint --version)
               echo "installed Ansible version: $ansible_version"  
