@@ -113,12 +113,11 @@ jobs:
         # install dependencies if cache does not exist
         #----------------------------------------------
         - name: setup poetry project and Install dependencies
-          shell: bash
           if: steps.install_poetry.outcome == 'success' && ${{ steps.cached_poetry_install.outputs.cache-hit != 'true' }}
           run: |
              source ~/.bashrc
-             sudo which mkdir
              which mkdir
+             env
              mkdir -p ${{ env.PROJECT_NAME }}
              cd ${{ env.PROJECT_NAME }}
              pyenv local ${{ matrix.python-version }}
