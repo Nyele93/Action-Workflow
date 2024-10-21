@@ -132,6 +132,7 @@ jobs:
               poetry config installer.parallel true
               poetry config installer.max-workers 5
               poetry install --no-interaction --no-root
+              poetry show
               ansible_version=$(poetry run ansible --version)
               ansible_lint_version=$(poetry run ansible-lint --version)
               echo "installed Ansible version: $ansible_version"  
