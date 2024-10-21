@@ -39,8 +39,8 @@ jobs:
         #----------------------------------------------
         #       check-out repo and set-up python
         #----------------------------------------------
-        - name: Get code
-          uses: actions/checkout@v3
+        #- name: Get code
+        #  uses: actions/checkout@v3
             #with:
         #- name: setup python
           #id: install-python
