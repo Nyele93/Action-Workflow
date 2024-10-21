@@ -3,10 +3,18 @@ on:
     workflow_call:
         inputs:
            caching:
-            description: 'whether to cache dependencies or not'
-            required: true
-            default: true
-            type: boolean
+             description: 'whether to cache dependencies or not'
+             required: true
+             default: true
+             type: boolean
+           python_version:
+              description: 'python version from the matrix'
+              required: true
+              type: string
+           poetry_version:
+                description: 'poetry version for the cache key'
+                required: true
+                type: string              
         outputs:
             cache_result:
               description: The result of the cache check.
@@ -15,34 +23,23 @@ on:
 jobs:
   cache_install_and_dependencies:
     outputs:
-       cache_check: ${{ steps.cached_dependencies.outputs.cache-hit }}    
-    continue-on-error: false
-    timeout-minutes: 5
+       cache_check: ${{ steps.cached_dependencies.outputs.cache-hit }}
     runs-on: ubuntu-latest 
-    strategy:
-        fail-fast: false
-        matrix:
-          python-version: ['3.9','3.10']  # Choose compatible versions
-    env:
-      POETRY_VERSION: "1.5.1"
-      ACTIONS_RUNNER_DEBUG: 'true'
     steps:
     #----------------------------------------------
     #------  cache Poetry and dependencies  -------
     #----------------------------------------------  
     - name: Cache poetry installation
       if: inputs.caching == 'true'
-      id: cached_poetry_install
-      uses: actions/cache@v4
-      with:
-          path: ~/.cache/pypoetry
-          key: poetry-cache-${{ runner.os }}-${{ matrix.python-version }}-${{ env.POETRY_VERSION }} 
+      shell: bash
+      run: | 
+        echo "using cached Poetry version - ${{ inputs.poetry_version }} and pyenv python version: ${{ inputs.python_version }}"
     - name: Cache Packages
       if: inputs.caching == 'true'
       id: cached_dependencies
-      uses: actions/cache@v4
-      with:
-          path: ~/.local
-          key: poetry-local-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}
+      shell: bash
+      run: | 
+        echo "using cached PPackages in Poetry env."
+
 
 

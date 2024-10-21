@@ -18,6 +18,9 @@ on:
 env:
   POETRY_VERSION: "1.5.1"
   ACTIONS_RUNNER_DEBUG: 'true'
+  PLAYBOOK_DIR: ./playbooks/proj_name/
+  PROJECT_NAME: 'python_macro_deploy'
+  USE_CACHE: true
 
 jobs: 
   deploy_python_macro:
@@ -29,24 +32,19 @@ jobs:
           exclude:
             - python-version: 3.8
               operating-system: ubuntu-latest
-    env:
-      PLAYBOOK_DIR: ./playbooks/proj_name/
-      PROJECT_NAME: 'python_macro_deploy'
-    runs-on: ${{ matrix.operating-system }}
+    environment: deploy_prod
+    runs-on: ${{ matrix.operating-system }}           
     outputs:
-      script-file: ${{ steps.write_py_file.outputs.py_output_file }}
+       cache_result: ${{ steps.cached_dependencies.outputs.cache-hit }}
+       script-file: ${{ steps.write_py_file.outputs.py_output_file }}
+       python_version:
+       poetry_version: 
     steps:
         #----------------------------------------------
         #       check-out repo and set-up python
         #----------------------------------------------
         - name: Get code
           uses: actions/checkout@v3
-            #with:
-        #- name: setup python
-          #id: install-python
-          #uses: actions/setup-python@v4
-          #with: 
-            #python-version ${{ matrix.python-version }}#
         - name: Install pyenv
           id: install_pyenv
           shell: bash
@@ -79,21 +77,27 @@ jobs:
         # using custom action.continue-on-error
         #-----------------------------------------------------
         - name: Using custom action
-          uses: ./.github/actions/custom_deploy_actions            
-        #------------------------------------------------------------------------------------
-        #   load cached poetry install and dependencies if cache exists using custom actions
-        #-------------------------------------------------------------------------------------
-        - name: Load & cache dependencies
-          id: cache_install_deps
-          uses: ./.github/workflows/poetry_dependency_caching.yml   ## reusable workflow
+          uses: ./.github/actions/custom_deploy_actions
+
+        - name: Cache poetry installation
+          id: cached_poetry_install
+          uses: actions/cache@v4
           with:
-            caching: true
+              path: ~/.cache/pypoetry
+              key: poetry-cache-${{ runner.os }}-${{ matrix.python-version }}-${{ env.poetry_version }}
+
+        - name: Cache Packages
+          id: cached_dependencies
+          uses: actions/cache@v4
+          with:
+              path: ~/.local
+              key: poetry-local-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('.github/workflows/*.yml') }}
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------
         - name: install poetry
           id: install_poetry
-          if: steps.cache_install_deps.outputs.cache_result != 'true'
+          if: ${{ steps.cached_dependencies.outputs.cache-hit }} != 'true' && ${{ env.USE_CACHE }} is true
           run: |
                 source ~/.bashrc
                 curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python3 -            
@@ -104,7 +108,7 @@ jobs:
           id: write_py_file
           run: |
              source ~/.bashrc
-             mkdir -p ${{ env.PROJECT_NAME }}
+             mkdir -p $PROJECT_NAME
              cp ./deploy_macro.py "${{ env.PROJECT_NAME }}"/
              cd ${{ env.PROJECT_NAME }}
              pyenv install ${{ matrix.python-version }}
@@ -157,6 +161,15 @@ jobs:
       - name: check set ENV vars
         run: |
           echo "loading environment secret: ${{ secrets.CH_UAT_USER_PASSWD }}"
+
+  check_caching_info:
+    needs: [deploy_python_macro]
+    if: always()
+    uses: ./.github/workflows/poetry_dependency_caching.yml   ## reusable workflow
+    with:
+      caching: ${{ needs.deploy_python_macro.outputs.cache_result}}
+      python_version: ${{ needs.deploy_python_macro.outputs.python_version }}
+      poetry_version: ${{ needs.deploy_python_macro.outputs.poetry_version }}
 
   display_deployment_base_info:
     needs: [deploy_python_macro, deploy_clickhouse]
