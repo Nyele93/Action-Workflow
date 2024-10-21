@@ -114,7 +114,7 @@ jobs:
              pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
              poetry init -q
-             poetry env use ${{ matrix.python-version }}
+             poetry env use $(pyenv which python)
              poetry install --no-interaction --no-root
              poetry lock --no-update
              poetry run python3 deploy_macro.py
@@ -133,7 +133,7 @@ jobs:
               poetry config installer.max-workers 5
               poetry config virtualenvs.in-project true
               poetry config virtualenvs.prefer-active-python true
-              poetry env use ${{ matrix.python-version }}
+              poetry env use $(pyenv which python)
               ##source $(poetry env info --path)/bin/activate##
               poetry install --no-interaction --no-root
               poetry show
