@@ -82,7 +82,7 @@ jobs:
           id: cache_install_deps
           uses: ./.github/workflows/poetry_dependency_caching.yml   ## reusable workflow
           with:
-            caching: 'true'
+            caching: true
         #----------------------------------------------
         #  -----  install & configure poetry  ---------
         #----------------------------------------------

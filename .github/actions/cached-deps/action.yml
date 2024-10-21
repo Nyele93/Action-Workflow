@@ -1,7 +1,7 @@
 name: 'Get_Cache_Dependencies'
 description: 'Get the Dependencies and Cache them'
 inputs:
-  caching:
+  use_caching:
     description: 'whether to cache dependencies or not'
     required: true
     default: 'true'

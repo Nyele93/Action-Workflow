@@ -5,8 +5,8 @@ on:
            caching:
             description: 'whether to cache dependencies or not'
             required: true
-            default: 'true'
-            type: string
+            default: true
+            type: boolean
         outputs:
             cache_result:
               description: The result of the cache check.
