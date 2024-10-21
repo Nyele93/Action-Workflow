@@ -5,6 +5,10 @@ inputs:
     description: 'whether to cache dependencies or not'
     required: true
     default: 'true'
+outputs:
+  used-cache:
+    description: 'whether to cache dependencies or not'
+    value: ${{ steps.check_custom_action.outputs.cache }}   
 runs:
   using: 'composite'
   steps:
@@ -12,6 +16,8 @@ runs:
     #------  cache Poetry and dependencies  -------
     #----------------------------------------------  
     - name: Check custom action
+      id: check_custom_action
       shell: bash
       run: |
         echo "Custom Action working..."
+        echo "cache='${{ inputs.caching }}'" >> $GITHUB_OUTPUT
