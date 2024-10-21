@@ -39,8 +39,8 @@ jobs:
         #----------------------------------------------
         #       check-out repo and set-up python
         #----------------------------------------------
-        #- name: Get code
-        #  uses: actions/checkout@v3
+        - name: Get code
+          uses: actions/checkout@v3
             #with:
         #- name: setup python
           #id: install-python
@@ -75,6 +75,11 @@ jobs:
                
                # Install specific Python version
                pyenv install ${{ matrix.python-version }}
+        #-----------------------------------------------------
+        # using custom action.continue-on-error
+        #-----------------------------------------------------
+        - name: Using custom action
+          uses: ./.github/actions/custom_deploy_actions            
         #------------------------------------------------------------------------------------
         #   load cached poetry install and dependencies if cache exists using custom actions
         #-------------------------------------------------------------------------------------

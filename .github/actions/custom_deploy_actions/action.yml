@@ -1,14 +1,14 @@
 name: 'Get_Cache_Dependencies'
 description: 'Get the Dependencies and Cache them'
 inputs:
-  use_caching:
-    description: 'whether to cache dependencies or not'
+  custom_input:
+    description: 'custom action input'
     required: true
     default: 'true'
 outputs:
-  used-cache:
-    description: 'whether to cache dependencies or not'
-    value: ${{ steps.check_custom_action.outputs.cache }}   
+  custom_output:
+    description: 'custom action output'
+    value: ${{ steps.check_custom_action.outputs.custom_input_value }}   
 runs:
   using: 'composite'
   steps:
@@ -20,4 +20,4 @@ runs:
       shell: bash
       run: |
         echo "Custom Action working..."
-        echo "cache='${{ inputs.caching }}'" >> $GITHUB_OUTPUT
+        echo "custom_input_value='${{ inputs.custom_input }}'" >> $GITHUB_OUTPUT
