@@ -108,8 +108,9 @@ jobs:
           id: write_py_file
           run: |
              source ~/.bashrc
-             mkdir -p ./$PROJECT_NAME
+             [ ! -d "./$PROJECT_NAME" ] && mkdir -p "./$PROJECT_NAME"
              cp ./deploy_macro.py "./${{ env.PROJECT_NAME }}"/
+             echo "copied dpeloyment file to target directory"
              cd ${{ env.PROJECT_NAME }}
              pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
