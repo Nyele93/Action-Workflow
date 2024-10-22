@@ -109,18 +109,16 @@ jobs:
           run: |
              source ~/.bashrc
              [ ! -d "./$PROJECT_NAME" ] && mkdir -p "./$PROJECT_NAME"
-             cp ./deploy_macro.py "./${{ env.PROJECT_NAME }}"/
-             echo "copied dpeloyment file to target directory"
+             cp ./deploy_macro.py "./${{ env.PROJECT_NAME }}/"
              cd ${{ env.PROJECT_NAME }}
-             echo $(pwd)
              pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
              poetry init -q
              poetry env use $(pyenv which python)
              poetry install --no-interaction --no-root
-             cp ./pyproject.toml .
-             poetry lock --no-update
+             cp -f ./pyproject.toml .
              cat pyproject.toml
+             poetry lock --no-update
              poetry run python3 deploy_macro.py
              compact_output=$(cat py_output.json | jq -c '.')
              echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
