@@ -113,10 +113,10 @@ jobs:
              cd ${{ env.PROJECT_NAME }}
              pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
-             poetry init -q
+             #poetry init -q|-n
              poetry env use $(pyenv which python)
-             poetry install --no-interaction --no-root
              cp -f ./pyproject.toml .
+             poetry install --no-interaction --no-root
              cat pyproject.toml
              poetry lock --no-update
              poetry run python3 deploy_macro.py
