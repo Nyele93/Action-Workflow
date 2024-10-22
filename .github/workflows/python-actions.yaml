@@ -117,6 +117,7 @@ jobs:
              poetry env use $(pyenv which python)
              poetry install --no-interaction --no-root
              poetry lock --no-update
+             cat pyproject.toml
              poetry run python3 deploy_macro.py
              compact_output=$(cat py_output.json | jq -c '.')
              echo "py_output_file=${compact_output}" >> $GITHUB_OUTPUT
