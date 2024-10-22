@@ -112,12 +112,13 @@ jobs:
              cp ./deploy_macro.py "./${{ env.PROJECT_NAME }}"/
              echo "copied dpeloyment file to target directory"
              cd ${{ env.PROJECT_NAME }}
+             echo $(pwd)
              pyenv install ${{ matrix.python-version }}
              pyenv local ${{ matrix.python-version }}
              poetry init -q
              poetry env use $(pyenv which python)
              poetry install --no-interaction --no-root
-             cp ./pyproject.toml "./${{ env.PROJECT_NAME }}"/
+             cp ./pyproject.toml .
              poetry lock --no-update
              cat pyproject.toml
              poetry run python3 deploy_macro.py
