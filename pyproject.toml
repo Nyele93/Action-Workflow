@@ -4,7 +4,6 @@ version = "1.5.1"
 description = "Python macro deploy."
 authors = ["Michael Amadi <amadimicheal212@gmail.com>"]
 readme = "README.md"
-package-mode = false
 
 [tool.poetry.dependencies]
 ansible = "^10.5"
