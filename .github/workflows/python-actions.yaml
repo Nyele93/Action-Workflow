@@ -115,7 +115,7 @@ jobs:
              pyenv local ${{ matrix.python-version }}
              #poetry init -q|-n
              poetry env use $(pyenv which python)
-             cp -f ./pyproject.toml .
+             cp -f ../pyproject.toml .
              poetry install --no-interaction --no-root
              cat pyproject.toml
              poetry lock --no-update
