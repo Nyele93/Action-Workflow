@@ -8,7 +8,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 ansible = ">=2.9"
 ansible-lint = {version = "^6.12.1", markers = "platform_system != 'Windows'"}
-pyyaml = "^5.1.2"
+pyyaml = ">=6.0"
+setuptools = ">=42"
+wheel = ">=0.36"
 jinja2 = "^2.10.3"
 python = ">=3.9,<3.11"
 
