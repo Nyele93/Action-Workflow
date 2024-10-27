@@ -5,8 +5,8 @@ on:
            caching:
              description: 'whether to cache dependencies or not'
              required: true
-             default: true
-             type: boolean
+             default: 'true'
+             type: string #boolean
            python_version:
               description: 'python version from the matrix'
               required: true
