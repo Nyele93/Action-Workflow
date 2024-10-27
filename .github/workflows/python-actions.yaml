@@ -13,6 +13,9 @@ on:
       #- opened
       #- closed
       #- reopened
+  issues:
+    types:
+      - opened
   workflow_dispatch:
 
 env:
@@ -33,6 +36,8 @@ jobs:
             - python-version: 3.8
               operating-system: ubuntu-latest
     environment: deploy_prod
+    permissions: ##write-all  ##read-all
+      issues: write
     runs-on: ${{ matrix.operating-system }}           
     outputs:
        cache_result: ${{ steps.cached_dependencies.outputs.cache-hit }}
@@ -193,5 +198,25 @@ jobs:
     steps:
       - name: Check output of dpeloyment
         run: echo "${{ needs.display_deployment_base_info.outputs.deployment-results }}"
-        
+  
+  deploy_docker_actions:
+    runs-on: self-hosted
+      #labels: 
+        #- staging-runner-machine
+    steps:
+      - name: Starting Docker deploy
+        run: |
+          echo "startig Docker Deploy..."
+          mkdir -p ./docker_deploy
+
+      #- name: Deploy backup files
+      #  id: deploy_backup_files
+      #  uses: ./.github/actions/deploy_docker
+      #  env:
+      #    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+      #  with:
+      #    bucket: 
+      #    dist-folder: ./backup
+
 ## end of workflow.        
